@@ -27,6 +27,9 @@ namespace Chaigoo.Geometries
 
         public static bool IsPointOnLine(Point2 p1, Point2 p2, Point2 point)
         {
+            if (p1 == p2)
+                return false;
+
             return Vector.CrossProduct(p1 - point, point - p2) == 0;
         }
 
@@ -42,7 +45,7 @@ namespace Chaigoo.Geometries
             v1.Normalize();
             v2.Normalize();
 
-            return Vector.CrossProduct(v1, v2) <= Constants.Epsilon;
+            return Math.Abs(Vector.CrossProduct(v1, v2)) <= Constants.Epsilon;
         }
 
         public static bool IsPointAlmostOnLine(Line line, Point2 point)
@@ -94,7 +97,7 @@ namespace Chaigoo.Geometries
             v1.Normalize();
             var v2 = p3 - p4;
             v2.Normalize();
-            return Vector.CrossProduct(v1, v2) <= Constants.Epsilon;
+            return Math.Abs(Vector.CrossProduct(v1, v2)) <= Constants.Epsilon;
         }
 
         public static bool IsAlmostParallel(Line line1, Line line2)
@@ -127,9 +130,9 @@ namespace Chaigoo.Geometries
             return Line.IsAlmostOrthogonal(line1.p1, line1.p2, line2.p1, line2.p2);
         }
 
-        public static Point2? GetCross(Point2 p1, Point2 p2, Point2 p3, Point2 p4)
+        public static Point2? CrossBetween(Point2 p1, Point2 p2, Point2 p3, Point2 p4)
         {
-            if (Line.IsParallel(p1, p2, p3, p4) || Line.Equals(p1, p2, p3, p4))
+            if (Line.IsParallel(p1, p2, p3, p4))
                 return null;
 
 
@@ -139,6 +142,11 @@ namespace Chaigoo.Geometries
                         ((p1.X - p2.X) * (p3.Y - p4.Y) - (p3.X - p4.X) * (p1.Y - p2.Y));
 
             return new Point2(x, y);
+        }
+
+        public static Point2? CrossBetween(Line line1,Line line2)
+        {
+            return Line.CrossBetween(line1.p1, line1.p2, line2.p1, line2.p2);
         }
 
         public void Offset(double x,double y)

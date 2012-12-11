@@ -40,6 +40,11 @@ namespace Chaigoo.Geometries
             return v1.X * v2.Y - v1.Y * v2.X;
         }
 
+        public double CrossProduct(Vector vector)
+        {
+            return Vector.CrossProduct(this, vector);
+        }
+
         public void Normalize()
         {
             //if (this == Zero)
