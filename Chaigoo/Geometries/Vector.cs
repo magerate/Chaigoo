@@ -23,23 +23,10 @@ namespace Chaigoo.Geometries
             get { return Math.Sqrt(X * X + Y * Y); }
         }
 
-        //[0,2pi)
+        //(-pi,pi]
         public double Angle
         {
-            get
-            {
-                if (Zero == this)
-                    return 0;
-                if (X == 0)
-                    return Y > 0 ? Math.PI / 2 : 3 * Math.PI / 2;
-
-                if (X > 0 && Y >= 0)
-                    return Math.Atan2(Y, X);
-                else if (X > 0 && Y <= 0)
-                    return Math.PI * 2 + Math.Atan2(Y, X);
-                else
-                    return Math.PI + Math.Atan2(Y, X);
-            }
+            get { return Math.Atan2(Y, X); }
         }
 
         public void Negate()
@@ -48,15 +35,15 @@ namespace Chaigoo.Geometries
             Y = -Y;
         }
 
-        public static Vector Cross(Vector left, Vector right)
+        public static double CrossProduct(Vector v1, Vector v2)
         {
-            left.X = left.X * right.X;
-            left.Y = left.Y * right.Y;
-            return left;
+            return v1.X * v2.Y - v1.Y * v2.X;
         }
 
         public void Normalize()
         {
+            //if (this == Zero)
+            //    throw new InvalidOperationException("Can't normalize zero vector");
             this /= Length;
         }
 
@@ -137,6 +124,23 @@ namespace Chaigoo.Geometries
         public override string ToString()
         {
             return string.Format("({0},{1})", X.ToString(), Y.ToString());
+        }
+
+        public static double AngleBetween(Vector v1, Vector v2)
+        {
+            return Math.Atan2(CrossProduct(v1, v2), v1 * v2);
+        }
+
+        public static Vector Rotate(Vector vector, double angle)
+        {
+            var x = Math.Cos(angle) * vector.X - Math.Sin(angle) * vector.Y;
+            var y = Math.Sin(angle) * vector.X + Math.Cos(angle) * vector.Y;
+            return new Vector(x, y);
+        }
+
+        public void Rotate(double angle)
+        {
+            this = Vector.Rotate(this, angle);
         }
     }
 }
