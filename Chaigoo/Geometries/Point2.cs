@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace Chaigoo.Geometries
+﻿namespace Chaigoo.Geometries
 {
+    using System;
+
     public struct Point2:IEquatable<Point2>
     {
         public static readonly Point2 Empty = new Point2(0, 0);

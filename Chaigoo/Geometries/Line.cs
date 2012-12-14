@@ -1,11 +1,17 @@
-﻿using System;
-
-namespace Chaigoo.Geometries
+﻿namespace Chaigoo.Geometries
 {
+    using System;
+
     public struct Line : IEquatable<Line>
     {
         private Point2 p1;
         private Point2 p2;
+
+        public Line(Point2 p1, Point2 p2)
+        {
+            this.p1 = p1;
+            this.p2 = p2;
+        }
 
         public Point2 P1
         {
@@ -19,13 +25,12 @@ namespace Chaigoo.Geometries
             set { p2 = value; }
         }
 
-        public Line(Point2 p1, Point2 p2)
+        public bool IsEmpty
         {
-            this.p1 = p1;
-            this.p2 = p2;
+            get { return p1 == p2; }
         }
 
-        public static bool IsPointOnLine(Point2 p1, Point2 p2, Point2 point)
+        public static bool Contains(Point2 p1, Point2 p2, Point2 point)
         {
             if (p1 == p2)
                 return false;
@@ -33,39 +38,37 @@ namespace Chaigoo.Geometries
             return Vector.CrossProduct(p1 - point, point - p2) == 0;
         }
 
-        public static bool IsPointOnLine(Line line, Point2 point)
+        public bool Contains(Point2 point)
         {
-            return Line.IsPointOnLine(line.p1, line.p2, point);
+            return Line.Contains(p1, p2, point);
         }
 
-        public static bool IsPointAlmostOnLine(Point2 p1, Point2 p2, Point2 point)
+        public static bool AlmostContains(Point2 p1, Point2 p2, Point2 point)
         {
-            var v1 = p1 - point;
-            var v2 = point - p2;
-            v1.Normalize();
-            v2.Normalize();
+            if (p1 == p2)
+                return false;
+
+            var v1 = Vector.Normalize(p1 - point);
+            var v2 = Vector.Normalize(point - p2);
 
             return Math.Abs(Vector.CrossProduct(v1, v2)) <= Constants.Epsilon;
         }
 
-        public static bool IsPointAlmostOnLine(Line line, Point2 point)
+        public bool AlmostContains(Point2 point)
         {
-            return Line.IsPointAlmostOnLine(line.p1, line.p2, point);
+            return Line.AlmostContains(p1, p2, point);
         }
 
         public static bool Equals(Point2 p1, Point2 p2, Point2 p3, Point2 p4)
         {
-            return IsPointOnLine(p1, p2, p3) && IsPointOnLine(p1, p2, p4);
-        }
-
-        public static bool Equals(Line line1, Line line2)
-        {
-            return Equals(line1.p1, line1.p2, line2.p1, line2.p2);
+            if (p3 == p4)
+                return false;
+            return Line.Contains(p1, p2, p3) && Line.Contains(p1, p2, p4);
         }
 
         public bool Equals(Line line)
         {
-            return Line.Equals(line, this);
+            return Line.Equals(p1, p2, line.p1, line.p2);
         }
 
         public override bool Equals(object obj)
@@ -75,24 +78,45 @@ namespace Chaigoo.Geometries
             return Equals((Line)obj);
         }
 
+        public static bool operator ==(Line left, Line right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(Line left, Line right)
+        {
+            return !left.Equals(right);
+        }
+
         public override int GetHashCode()
         {
             //wrong 
             return p1.GetHashCode() ^ p2.GetHashCode();
         }
 
-        public static bool IsParallel(Point2 p1, Point2 p2, Point2 p3, Point2 p4)
+        public static bool Parallels(Point2 p1, Point2 p2, Point2 p3, Point2 p4)
         {
+            if (p1 == p2 || p3 == p4)
+                return false;
+
             return Vector.CrossProduct(p1 - p2, p3 - p4) == 0;
         }
 
-        public static bool IsParallel(Line line1, Line line2)
+        public bool Parallels(Line line)
         {
-            return Line.IsParallel(line1.p1, line1.p2, line2.p1, line2.p2);
+            return Line.Parallels(p1, p2, line.p1, line.p2);
         }
 
-        public static bool IsAlmostParallel(Point2 p1, Point2 p2, Point2 p3, Point2 p4)
+        public bool Parallels(Point2 p1, Point2 p2)
         {
+            return Line.Parallels(p1, p2, p1, p2);
+        }
+
+        public static bool AlmostParallels(Point2 p1, Point2 p2, Point2 p3, Point2 p4)
+        {
+            if (p1 == p2 || p3 == p4)
+                return false;
+
             var v1 = p1 - p2;
             v1.Normalize();
             var v2 = p3 - p4;
@@ -100,41 +124,58 @@ namespace Chaigoo.Geometries
             return Math.Abs(Vector.CrossProduct(v1, v2)) <= Constants.Epsilon;
         }
 
-        public static bool IsAlmostParallel(Line line1, Line line2)
+        public bool AlmostParallels(Line line)
         {
-            return Line.IsAlmostParallel(line1.p1, line1.p2, line2.p1, line2.p2);
+            return Line.AlmostParallels(p1, p2, p1, p2);
         }
 
-        public static bool IsOrthogonal(Point2 p1, Point2 p2, Point2 p3, Point2 p4)
+        public bool AlmostParallels(Point2 p1,Point2 p2)
         {
+            return Line.AlmostParallels(p1, p2, p1, p2);
+        }
+
+        public static bool Orthos(Point2 p1, Point2 p2, Point2 p3, Point2 p4)
+        {
+            if (p1 == p2 || p3 == p4)
+                return false;
+
             return (p1 - p2) * (p3 - p4) == 0;
         }
 
-        public static bool IsOrthogonal(Line line1, Line line2)
+        public bool Orthos(Line line)
         {
-            return Line.IsOrthogonal(line1.p1, line1.p2, line2.p1, line2.p2);
+            return Line.Orthos(p1, p2, line.p1, line.p2);
         }
 
-        public static bool IsAlmostOrthogonal(Point2 p1, Point2 p2, Point2 p3, Point2 p4)
+        public bool Orthos(Point2 p1,Point2 p2)
         {
-            var v1 = p1 - p2;
-            v1.Normalize();
-            var v2 = p3 - p4;
-            v2.Normalize();
+            return Line.Orthos(p1, p2, p1, p2);
+        }
+
+        public static bool AlmostOrthos(Point2 p1, Point2 p2, Point2 p3, Point2 p4)
+        {
+            if (p1 == p2 || p3 == p4)
+                return false;
+            var v1 = Vector.Normalize(p1 - p2);
+            var v2 = Vector.Normalize(p3 - p4);
 
             return v1 * v2 <= Constants.Epsilon;
         }
 
-        public static bool IsAlmostOrthogonal(Line line1, Line line2)
+        public bool AlmostOrthos(Line line)
         {
-            return Line.IsAlmostOrthogonal(line1.p1, line1.p2, line2.p1, line2.p2);
+            return Line.AlmostOrthos(p1, p2, line.p1, line.p2);
+        }
+
+        public bool AlmostOrthos(Point2 p1,Point2 p2)
+        {
+            return Line.AlmostOrthos(p1, p2, p1, p2);
         }
 
         public static Point2? CrossBetween(Point2 p1, Point2 p2, Point2 p3, Point2 p4)
         {
-            if (Line.IsParallel(p1, p2, p3, p4))
+            if (p1 == p2 || p3 == p4 || Line.Parallels(p1, p2, p3, p4))
                 return null;
-
 
             double x = ((p1.X * p2.Y - p2.X * p1.Y) * (p3.X - p4.X) - (p3.X * p4.Y - p4.X * p3.Y) * (p1.X - p2.X)) /
                         ((p1.X - p2.X) * (p3.Y - p4.Y) - (p3.X - p4.X) * (p1.Y - p2.Y));
@@ -144,12 +185,12 @@ namespace Chaigoo.Geometries
             return new Point2(x, y);
         }
 
-        public static Point2? CrossBetween(Line line1,Line line2)
+        public static Point2? CrossBetween(Line line1, Line line2)
         {
             return Line.CrossBetween(line1.p1, line1.p2, line2.p1, line2.p2);
         }
 
-        public void Offset(double x,double y)
+        public void Offset(double x, double y)
         {
             p1.Offset(x, y);
             p2.Offset(x, y);
@@ -160,14 +201,14 @@ namespace Chaigoo.Geometries
             this.Offset(vector.X, vector.Y);
         }
 
-        public static Line Rotate(Line line,Point2 point,double angle)
+        public static Line Rotate(Line line, Point2 point, double angle)
         {
             var p1 = Point2.Rotate(line.p1, point, angle);
             var p2 = Point2.Rotate(line.p2, point, angle);
             return new Line(p1, p2);
         }
 
-        public void Rotate(Point2 point,double angle)
+        public void Rotate(Point2 point, double angle)
         {
             p1.Rotate(point, angle);
             p2.Rotate(point, angle);
@@ -178,7 +219,7 @@ namespace Chaigoo.Geometries
             this.Rotate(Point2.Empty, angle);
         }
 
-        public static Point2 Project(Point2 p1,Point2 p2,Point2 point)
+        public static Point2 Project(Point2 p1, Point2 p2, Point2 point)
         {
             if (p1 == p2)
                 return p1;
@@ -188,7 +229,7 @@ namespace Chaigoo.Geometries
             return p1 + v1 * v2 / v2.LengthSquared * v2;
         }
 
-        public static Point2 Project(Line line,Point2 point)
+        public static Point2 Project(Line line, Point2 point)
         {
             return Line.Project(line.p1, line.p2, point);
         }
@@ -198,7 +239,7 @@ namespace Chaigoo.Geometries
             return Line.Project(this, point);
         }
 
-        public static double DistanceBetween(Point2 p1,Point2 p2,Point2 point)
+        public static double DistanceBetween(Point2 p1, Point2 p2, Point2 point)
         {
             if (p1 == p2)
                 return Point2.DistanceBetween(p1, point);
@@ -209,7 +250,7 @@ namespace Chaigoo.Geometries
             return Math.Abs(Vector.CrossProduct(v1, v2) / v2.Length);
         }
 
-        public static double DistanceBetween(Line line,Point2 point)
+        public static double DistanceBetween(Line line, Point2 point)
         {
             return Line.DistanceBetween(line.p1, line.p2, point);
         }
@@ -218,7 +259,5 @@ namespace Chaigoo.Geometries
         {
             return Line.DistanceBetween(this, point);
         }
-
-
     }
 }

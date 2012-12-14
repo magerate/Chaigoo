@@ -42,10 +42,13 @@
   <ItemGroup>
     <Compile Include="Geometries\Constants.cs" />
     <Compile Include="Geometries\Line.cs" />
-    <Compile Include="Geometries\Point.cs" />
+    <Compile Include="Geometries\OpenRange.cs" />
+    <Compile Include="Geometries\Point2.cs" />
     <Compile Include="Geometries\Range.cs" />
     <Compile Include="Geometries\Ray.cs" />
+    <Compile Include="Geometries\Rect.cs" />
     <Compile Include="Geometries\Segment.cs" />
+    <Compile Include="Geometries\Size2.cs" />
     <Compile Include="Geometries\Vector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

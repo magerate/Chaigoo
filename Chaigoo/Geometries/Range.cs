@@ -1,8 +1,7 @@
-﻿using System;
-
-
-namespace Chaigoo.Geometries
+﻿namespace Chaigoo.Geometries
 {
+    using System;
+
     public struct Range
     {
         private double min;
@@ -31,6 +30,12 @@ namespace Chaigoo.Geometries
         public static bool Contains(double x, double y, double value)
         {
             return value >= Math.Min(x, y) && value <= Math.Max(x, y);
+        }
+
+        public static bool Contains(double x,double y,double value,double delta)
+        {
+            return value >= Math.Min(x, y) - Math.Abs(delta) && 
+                value <= Math.Max(x, y) + Math.Abs(delta);
         }
     }
 }

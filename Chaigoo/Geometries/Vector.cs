@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace Chaigoo.Geometries
+﻿namespace Chaigoo.Geometries
 {
+    using System;
+
     public struct Vector : IEquatable<Vector>
     {
         public static readonly Vector Zero = new Vector(0, 0);
@@ -45,10 +45,18 @@ namespace Chaigoo.Geometries
             return Vector.CrossProduct(this, vector);
         }
 
+        public static Vector Normalize(Vector vector)
+        {
+            if (vector == Zero)
+                return Zero;
+            vector /= vector.Length;
+            return vector;
+        }
+
         public void Normalize()
         {
-            //if (this == Zero)
-            //    throw new InvalidOperationException("Can't normalize zero vector");
+            if (this == Zero)
+                return;
             this /= Length;
         }
 
@@ -136,8 +144,16 @@ namespace Chaigoo.Geometries
             return Math.Atan2(CrossProduct(v1, v2), v1 * v2);
         }
 
+        public double AngleBetween(Vector vector)
+        {
+            return Vector.AngleBetween(this, vector);
+        }
+
         public static Vector Rotate(Vector vector, double angle)
         {
+            if (vector == Zero)
+                return Zero;
+
             var x = Math.Cos(angle) * vector.X - Math.Sin(angle) * vector.Y;
             var y = Math.Sin(angle) * vector.X + Math.Cos(angle) * vector.Y;
             return new Vector(x, y);
